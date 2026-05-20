@@ -296,7 +296,7 @@ export function DeadlineForm() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label className="text-xs font-medium text-slate-700">Submission method</Label>
-                <Select value={submissionMethod} onValueChange={setSubmissionMethod}>
+                <Select value={submissionMethod} onValueChange={(v) => setSubmissionMethod(v ?? "")}>
                   <SelectTrigger className="w-full rounded-md border-slate-200 text-sm">
                     <SelectValue placeholder="Select method..." />
                   </SelectTrigger>
@@ -327,7 +327,7 @@ export function DeadlineForm() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label className="text-xs font-medium text-slate-700">Internal Deadline type</Label>
-                <Select value={internalDeadlineType} onValueChange={setInternalDeadlineType}>
+                <Select value={internalDeadlineType} onValueChange={(v) => setInternalDeadlineType(v ?? "")}>
                   <SelectTrigger className="w-full rounded-md border-slate-200 text-sm">
                     <SelectValue placeholder="Select type..." />
                   </SelectTrigger>
@@ -355,7 +355,7 @@ export function DeadlineForm() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label className="text-xs font-medium text-slate-700">Assigned Reviewer</Label>
-                <Select value={assignedReviewer} onValueChange={setAssignedReviewer}>
+                <Select value={assignedReviewer} onValueChange={(v) => setAssignedReviewer(v ?? "")}>
                   <SelectTrigger className="w-full rounded-md border-slate-200 text-sm">
                     <SelectValue placeholder="Select reviewer..." />
                   </SelectTrigger>
@@ -415,7 +415,7 @@ export function DeadlineForm() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label className="text-xs font-medium text-slate-700">Delivery method</Label>
-                <Select value={deliveryMethod} onValueChange={setDeliveryMethod}>
+                <Select value={deliveryMethod} onValueChange={(v) => setDeliveryMethod(v ?? "")}>
                   <SelectTrigger className="w-full rounded-md border-slate-200 text-sm">
                     <SelectValue placeholder="Select method..." />
                   </SelectTrigger>
@@ -525,7 +525,7 @@ export function DeadlineForm() {
 
         <div className="flex flex-col gap-1.5">
           <Label className="text-xs font-medium text-slate-700">Responsible</Label>
-          <Select value={responsible} onValueChange={setResponsible}>
+          <Select value={responsible} onValueChange={(v) => setResponsible(v ?? "")}>
             <SelectTrigger className="w-full rounded-md border-slate-200 text-sm">
               <SelectValue placeholder="Select responsible users..." />
             </SelectTrigger>

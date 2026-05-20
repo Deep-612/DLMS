@@ -12,8 +12,9 @@ import {
   type SortingState,
   type ColumnFiltersState,
   type RowSelectionState,
+  type Updater,
 } from "@tanstack/react-table"
-import { ArrowDownUp, FileText, Minus } from "lucide-react"
+import { ArrowDownUp, ChevronDown, FileText, Minus } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import {
@@ -189,7 +190,10 @@ export function DocumentTable({
     state: { sorting, columnFilters, rowSelection, globalFilter },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onRowSelectionChange: onRowSelectionChange,
+    onRowSelectionChange: (updater: Updater<RowSelectionState>) => {
+      const next = typeof updater === "function" ? updater(rowSelection) : updater
+      onRowSelectionChange(next)
+    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
