@@ -29,7 +29,7 @@ const DEADLINE_TYPES = ["Hearing", "Filing", "Response", "Appeal", "Other"]
 export function DeadlineForm() {
   const [matter, setMatter] = useState("")
   const [partner, setPartner] = useState("")
-  const [classification, setClassification] = useState<Classification>("unregistered")
+  const [classification, setClassification] = useState<Classification>("as-listed")
 
   // Team Members and Assistants as tag lists
   const [teamMembers, setTeamMembers] = useState([
