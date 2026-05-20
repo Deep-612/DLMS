@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   useReactTable,
   getCoreRowModel,
@@ -52,6 +53,7 @@ export function DocumentTable({
   rowSelection,
   onRowSelectionChange,
 }: Props) {
+  const router = useRouter()
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
@@ -171,7 +173,7 @@ export function DocumentTable({
             size="sm"
             variant="outline"
             className="h-7 text-xs px-3 rounded-md border-slate-200 text-slate-700 hover:bg-slate-50 font-medium"
-            onClick={() => console.log("Review", row.original.id)}
+            onClick={() => router.push(`/inbox/${row.original.id}/review`)}
           >
             Review
           </Button>
