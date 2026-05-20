@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { AlertTriangle, ArrowDownUp, CalendarDays, Clock, FolderCog, Pencil, Plus, Search, Trash2 } from "lucide-react"
+import { AlertTriangle, ArrowDownUp, CalendarDays, ChevronDown, Clock, FolderCog, Pencil, Plus, Search, Trash2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -163,6 +163,7 @@ export function DeadlineForm() {
             tags={teamMembers}
             onRemove={(id) => setTeamMembers((t) => t.filter((m) => m.id !== id))}
             placeholder="Add team members..."
+            suffix={<ChevronDown className="h-4 w-4 text-slate-400" />}
           />
         </div>
 
@@ -173,6 +174,7 @@ export function DeadlineForm() {
             tags={assistants}
             onRemove={(id) => setAssistants((a) => a.filter((m) => m.id !== id))}
             placeholder="Add assistants..."
+            suffix={<ChevronDown className="h-4 w-4 text-slate-400" />}
           />
         </div>
 
