@@ -24,7 +24,7 @@ type DeadlineEntry = {
   duration: string
 }
 
-const DEADLINE_TYPES = ["Hearing", "Filing", "Response", "Appeal", "Other"]
+const DEADLINE_TYPES = ["Hearing", "External", "Internal", "Reminder"]
 
 export function DeadlineForm() {
   const [matter, setMatter] = useState("")
