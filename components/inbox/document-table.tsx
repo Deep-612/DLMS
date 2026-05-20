@@ -170,16 +170,14 @@ export function DocumentTable({
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-2">
-          {row.original.status === "In Progress" && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 text-xs px-3"
-              onClick={() => console.log("Review", row.original.id)}
-            >
-              Review
-            </Button>
-          )}
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs px-3 rounded-md border-slate-200 text-slate-700 hover:bg-slate-50 font-medium"
+            onClick={() => console.log("Review", row.original.id)}
+          >
+            Review
+          </Button>
           <button
             onClick={() => row.toggleExpanded()}
             className="text-slate-400 hover:text-slate-600 transition-colors p-0.5"

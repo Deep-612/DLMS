@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Search, UserMinus } from "lucide-react"
+import { Check, ChevronDown, Search, UserMinus } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 import type { User } from "@/lib/types"
@@ -30,38 +30,42 @@ export function AssigneePicker({ value, onChange, currentUser }: Props) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className="flex items-center gap-2 text-left w-full min-w-0 cursor-pointer bg-transparent border-none p-0 focus:outline-none">
+      <PopoverTrigger className="flex items-center gap-2 text-left w-full min-w-0 cursor-pointer bg-transparent border-none p-0 focus:outline-none group">
         {value ? (
           <>
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700 overflow-hidden">
               {value.name[0]}
             </span>
-            <span className="flex flex-col leading-tight min-w-0 text-left">
+            <span className="flex flex-col leading-tight min-w-0 text-left flex-1">
               <span className="text-sm font-medium text-slate-900 truncate">{value.name}</span>
               <span className="text-xs text-slate-500">{value.initials}</span>
             </span>
+            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
           </>
         ) : (
-          <span className="flex flex-col leading-tight">
-            <span className="flex items-center gap-1 text-sm text-slate-400">
-              <UserMinus className="h-4 w-4 shrink-0" />
-              Unassigned
+          <>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+              <UserMinus className="h-4 w-4" />
             </span>
-            <span
-              role="button"
-              tabIndex={0}
-              className="text-xs text-blue-500 underline text-left"
-              onClick={(e) => {
-                e.stopPropagation()
-                onChange(currentUser)
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") { e.stopPropagation(); onChange(currentUser) }
-              }}
-            >
-              Assign to me
+            <span className="flex flex-col leading-tight flex-1">
+              <span className="text-sm text-slate-400">Unassigned</span>
+              <span
+                role="button"
+                tabIndex={0}
+                className="text-xs text-blue-500 underline text-left"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onChange(currentUser)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.stopPropagation(); onChange(currentUser) }
+                }}
+              >
+                Assign to me
+              </span>
             </span>
-          </span>
+            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+          </>
         )}
       </PopoverTrigger>
       <PopoverContent className="w-64 p-2" align="start">
