@@ -1,0 +1,265 @@
+"use client"
+
+import React, { useEffect, useState } from "react"
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  getExpandedRowModel,
+  flexRender,
+  createColumnHelper,
+  type SortingState,
+  type ColumnFiltersState,
+  type ExpandedState,
+  type RowSelectionState,
+} from "@tanstack/react-table"
+import { ArrowDownUp, ChevronDown, ChevronRight, FileText } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { StatusBadge } from "./status-badge"
+import { AssigneePicker } from "./assignee-picker"
+import type { Document, User } from "@/lib/types"
+import { CURRENT_USER } from "@/lib/mock-data"
+
+const columnHelper = createColumnHelper<Document>()
+
+function formatDate(iso: string) {
+  const d = new Date(iso)
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+}
+
+type Props = {
+  documents: Document[]
+  onDocumentsChange: (docs: Document[]) => void
+  globalFilter: string
+  statusFilter: string
+}
+
+export function DocumentTable({
+  documents,
+  onDocumentsChange,
+  globalFilter,
+  statusFilter,
+}: Props) {
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [expanded, setExpanded] = useState<ExpandedState>({})
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+  function updateAssignee(docId: string, user: User | null) {
+    onDocumentsChange(
+      documents.map((d) => (d.id === docId ? { ...d, assignedTo: user } : d))
+    )
+  }
+
+  const columns = [
+    columnHelper.display({
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(v) => row.toggleSelected(!!v)}
+          aria-label="Select row"
+          onClick={(e) => e.stopPropagation()}
+        />
+      ),
+    }),
+    columnHelper.accessor("id", {
+      header: ({ column }) => (
+        <button
+          className="flex items-center gap-1 font-medium text-slate-500 hover:text-slate-700"
+          onClick={() => column.toggleSorting()}
+        >
+          ID <ArrowDownUp className="h-3 w-3" />
+        </button>
+      ),
+      cell: (info) => (
+        <span className="font-medium text-slate-900">{info.getValue()}</span>
+      ),
+    }),
+    columnHelper.accessor("receivedDate", {
+      header: ({ column }) => (
+        <button
+          className="flex items-center gap-1 font-medium text-slate-500 hover:text-slate-700"
+          onClick={() => column.toggleSorting()}
+        >
+          Received Date <ArrowDownUp className="h-3 w-3" />
+        </button>
+      ),
+      cell: (info) => (
+        <span className="text-slate-600">{formatDate(info.getValue())}</span>
+      ),
+    }),
+    columnHelper.accessor("source", {
+      header: ({ column }) => (
+        <button
+          className="flex items-center gap-1 font-medium text-slate-500 hover:text-slate-700"
+          onClick={() => column.toggleSorting()}
+        >
+          Document Source <ArrowDownUp className="h-3 w-3" />
+        </button>
+      ),
+      cell: (info) => <span className="text-slate-600">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor("fileName", {
+      header: () => (
+        <span className="font-medium text-slate-500">Mail</span>
+      ),
+      cell: (info) => (
+        <span className="flex items-center gap-1.5 text-blue-500 underline cursor-pointer text-sm">
+          <FileText className="h-4 w-4 shrink-0" />
+          {info.getValue()}
+        </span>
+      ),
+    }),
+    columnHelper.accessor("status", {
+      header: () => <span className="font-medium text-slate-500">Status</span>,
+      cell: (info) => <StatusBadge status={info.getValue()} />,
+      filterFn: (row, _colId, filterValue) =>
+        !filterValue || row.original.status === filterValue,
+    }),
+    columnHelper.accessor("assignedTo", {
+      header: () => (
+        <span className="font-medium text-slate-500">Assigned to</span>
+      ),
+      cell: (info) => (
+        <AssigneePicker
+          value={info.getValue()}
+          onChange={(user) => updateAssignee(info.row.original.id, user)}
+          currentUser={CURRENT_USER}
+        />
+      ),
+    }),
+    columnHelper.display({
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="flex items-center justify-end gap-2">
+          {row.original.status === "In Progress" && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs px-3"
+              onClick={() => console.log("Review", row.original.id)}
+            >
+              Review
+            </Button>
+          )}
+          <button
+            onClick={() => row.toggleExpanded()}
+            className="text-slate-400 hover:text-slate-600 transition-colors p-0.5"
+            aria-label="Expand row"
+          >
+            {row.getIsExpanded() ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+      ),
+    }),
+  ]
+
+  const table = useReactTable({
+    data: documents,
+    columns,
+    state: { sorting, columnFilters, expanded, rowSelection, globalFilter },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onExpandedChange: setExpanded,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    globalFilterFn: (row, _colId, filterValue) => {
+      if (!filterValue) return true
+      const q = (filterValue as string).toLowerCase()
+      return (
+        row.original.id.toLowerCase().includes(q) ||
+        row.original.source.toLowerCase().includes(q)
+      )
+    },
+  })
+
+  // Sync status tab filter into TanStack column filter
+  useEffect(() => {
+    table.getColumn("status")?.setFilterValue(statusFilter || undefined)
+  }, [statusFilter]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div className="rounded-lg border border-slate-100 overflow-hidden">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((hg) => (
+            <TableRow key={hg.id} className="bg-slate-50 hover:bg-slate-50 border-slate-100">
+              {hg.headers.map((header) => (
+                <TableHead
+                  key={header.id}
+                  className="text-xs h-10 py-2.5 px-4 font-medium text-slate-500"
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={columns.length}
+                className="text-center text-slate-400 py-10 text-sm"
+              >
+                No documents found.
+              </TableCell>
+            </TableRow>
+          ) : (
+            table.getRowModel().rows.map((row) => (
+              <React.Fragment key={row.id}>
+                <TableRow
+                  className="hover:bg-slate-50/50 border-slate-100"
+                  data-state={row.getIsSelected() ? "selected" : undefined}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="py-3 px-4">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+                {row.getIsExpanded() && (
+                  <TableRow className="bg-slate-50/70 border-slate-100">
+                    <TableCell
+                      colSpan={columns.length}
+                      className="py-3 pl-10 text-sm text-slate-400 italic"
+                    >
+                      No details yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </React.Fragment>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
