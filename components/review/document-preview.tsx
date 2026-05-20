@@ -23,7 +23,7 @@ export function DocumentPreview() {
         </Button>
       </div>
 
-      {/* Document body — scrollable */}
+      {/* Document body — internal scroll only */}
       <div className="flex-1 overflow-auto bg-slate-50 flex items-start justify-center p-6">
         <div
           className="bg-white shadow-sm border border-slate-100 rounded-sm p-10 w-full max-w-[520px] transition-transform origin-top"
@@ -73,9 +73,9 @@ export function DocumentPreview() {
         </div>
       </div>
 
-      {/* PDF Nav Bar */}
-      <div className="shrink-0 flex items-center justify-center py-4 border-t border-slate-100 bg-white">
-        <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-full px-4 py-1.5 shadow-[0px_10px_40px_0px_rgba(0,0,0,0.08)]">
+      {/* PDF Nav Bar — always visible at the bottom */}
+      <div className="shrink-0 flex items-center justify-center py-4 bg-white border-t border-slate-100">
+        <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-full px-4 py-1.5 shadow-[0px_10px_40px_0px_rgba(0,0,0,0.12)]">
           {/* Zoom */}
           <div className="flex items-center gap-1">
             <button onClick={zoomIn} className="p-1 text-slate-600 hover:text-slate-900 transition-colors">
@@ -106,11 +106,12 @@ export function DocumentPreview() {
           <div className="h-5 w-px bg-slate-200" />
 
           {/* Highlighter */}
-          <button className="p-1 text-slate-500 hover:text-slate-800 transition-colors">
+          <button className="p-1 text-amber-500 hover:text-amber-600 transition-colors">
             <Highlighter className="h-5 w-5" />
           </button>
         </div>
       </div>
     </div>
+
   )
 }

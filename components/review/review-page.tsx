@@ -1,8 +1,10 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Toast } from "@/components/ui/toast"
 import { StatusBadge } from "@/components/inbox/status-badge"
 import { DocumentPreview } from "./document-preview"
 import { DeadlineForm } from "./deadline-form"
@@ -14,6 +16,11 @@ type Props = {
 
 export function ReviewPage({ document }: Props) {
   const router = useRouter()
+  const [showToast, setShowToast] = useState(false)
+
+  function handleSubmit() {
+    setShowToast(true)
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">
@@ -50,7 +57,7 @@ export function ReviewPage({ document }: Props) {
           </Button>
           <Button
             className="rounded-md bg-slate-900 text-white hover:bg-slate-800 h-9 text-sm font-medium px-4"
-            onClick={() => console.log("Submit for validation", document.id)}
+            onClick={handleSubmit}
           >
             Submit for 4-Eyes Validation
           </Button>
@@ -74,10 +81,21 @@ export function ReviewPage({ document }: Props) {
         </div>
 
         {/* Right: Form */}
-        <div className="w-[420px] shrink-0 overflow-y-auto">
+        <div className="flex-1 min-w-0 overflow-y-auto">
           <DeadlineForm />
         </div>
       </div>
+
+      {/* Toast notification */}
+      {showToast && (
+        <Toast
+          title="Submitted"
+          description="Deadline sent for validation."
+          actionLabel="Undo"
+          onAction={() => console.log("Undo submission", document.id)}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   )
 }

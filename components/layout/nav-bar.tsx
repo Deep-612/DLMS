@@ -8,9 +8,10 @@ import type { User } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 const NAV_LINKS = [
-  { href: "/inbox",    label: "Inbox" },
-  { href: "/calendar", label: "Calendar" },
-  { href: "/reports",  label: "Reports" },
+  { href: "/inbox",               label: "Inbox" },
+  { href: "/deadlines-review",    label: "Deadlines Review" },
+  { href: "/supervisor-inbox",    label: "Supervisor Inbox" },
+  { href: "/deadline-monitoring", label: "Deadline Monitoring" },
 ]
 
 type Props = {
