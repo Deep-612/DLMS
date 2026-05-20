@@ -1,20 +1,18 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
   getFilteredRowModel,
-  getExpandedRowModel,
   flexRender,
   createColumnHelper,
   type SortingState,
   type ColumnFiltersState,
-  type ExpandedState,
   type RowSelectionState,
 } from "@tanstack/react-table"
-import { ArrowDownUp, ChevronDown, ChevronRight, FileText, Minus } from "lucide-react"
+import { ArrowDownUp, FileText, Minus } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import {
@@ -56,7 +54,6 @@ export function DocumentTable({
 }: Props) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [expanded, setExpanded] = useState<ExpandedState>({})
 
   function updateAssignee(docId: string, user: User | null) {
     onDocumentsChange(
@@ -178,17 +175,6 @@ export function DocumentTable({
           >
             Review
           </Button>
-          <button
-            onClick={() => row.toggleExpanded()}
-            className="text-slate-400 hover:text-slate-600 transition-colors p-0.5"
-            aria-label="Expand row"
-          >
-            {row.getIsExpanded() ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </button>
         </div>
       ),
     }),
@@ -198,15 +184,13 @@ export function DocumentTable({
     data: documents,
     columns,
     getRowId: (row) => row.id,
-    state: { sorting, columnFilters, expanded, rowSelection, globalFilter },
+    state: { sorting, columnFilters, rowSelection, globalFilter },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onExpandedChange: setExpanded,
     onRowSelectionChange: onRowSelectionChange,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
     globalFilterFn: (row, _colId, filterValue) => {
       if (!filterValue) return true
       const q = (filterValue as string).toLowerCase()
@@ -253,28 +237,17 @@ export function DocumentTable({
             </TableRow>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <React.Fragment key={row.id}>
-                <TableRow
-                  className={`border-slate-100 transition-colors ${row.getIsSelected() ? "bg-slate-50" : "hover:bg-slate-50/50"}`}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-3 px-4">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                {row.getIsExpanded() && (
-                  <TableRow className="bg-slate-50/70 border-slate-100">
-                    <TableCell
-                      colSpan={columns.length}
-                      className="py-3 pl-10 text-sm text-slate-400 italic"
-                    >
-                      No details yet.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </React.Fragment>
+              <TableRow
+                key={row.id}
+                className={`border-slate-100 transition-colors ${row.getIsSelected() ? "bg-slate-50" : "hover:bg-slate-50/50"}`}
+                data-state={row.getIsSelected() ? "selected" : undefined}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id} className="py-3 px-4">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
             ))
           )}
         </TableBody>

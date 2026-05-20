@@ -118,7 +118,7 @@ export function InboxPage() {
             <div className="flex items-center gap-2 text-sm text-slate-500">
               <span>Filter:</span>
               <DropdownMenu>
-                <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-lg h-9 px-3 text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 transition-colors cursor-pointer text-slate-700">
+                <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md h-9 px-3 text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 transition-colors cursor-pointer text-slate-700">
                   {assigneeLabel}
                   <ChevronDown className="h-3.5 w-3.5" />
                 </DropdownMenuTrigger>
@@ -142,7 +142,7 @@ export function InboxPage() {
             {selectedCount > 0 && (
               <button
                 onClick={handleBulkAssign}
-                className="inline-flex items-center gap-2 rounded-lg h-9 px-4 text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+                className="inline-flex items-center gap-2 rounded-md h-9 px-4 text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 transition-colors"
               >
                 <User className="h-4 w-4" />
                 Assign to me ({selectedCount})
