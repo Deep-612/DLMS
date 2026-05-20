@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, User } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -11,6 +11,7 @@ import {
 import { NavBar } from "@/components/layout/nav-bar"
 import { DocumentTable } from "./document-table"
 import type { Document, DocumentStatus } from "@/lib/types"
+import type { RowSelectionState } from "@tanstack/react-table"
 import { MOCK_DOCUMENTS, MOCK_USERS, CURRENT_USER } from "@/lib/mock-data"
 import { cn } from "@/lib/utils"
 
@@ -28,6 +29,12 @@ export function InboxPage() {
   const [activeTab, setActiveTab] = useState<DocumentStatus | "">("")
   const [search, setSearch] = useState("")
   const [assigneeFilter, setAssigneeFilter] = useState<string | null>(null)
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+  const selectedCount = Object.values(rowSelection).filter(Boolean).length
+  const selectedIds = Object.entries(rowSelection)
+    .filter(([, v]) => v)
+    .map(([id]) => id)
 
   const pendingCount = documents.filter(
     (d) => !["Submitted for Validation", "Validated"].includes(d.status)
@@ -46,6 +53,22 @@ export function InboxPage() {
       : assigneeFilter === "unassigned"
       ? "Unassigned"
       : (MOCK_USERS.find((u) => u.id === assigneeFilter)?.name ?? "Assignee")
+
+  function handleDocumentsChange(updatedVisible: Document[]) {
+    // Merge updated visible docs back into the full documents array
+    setDocuments((prev) =>
+      prev.map((d) => updatedVisible.find((u) => u.id === d.id) ?? d)
+    )
+  }
+
+  function handleBulkAssign() {
+    setDocuments((prev) =>
+      prev.map((d) =>
+        selectedIds.includes(d.id) ? { ...d, assignedTo: CURRENT_USER } : d
+      )
+    )
+    setRowSelection({})
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">
@@ -90,36 +113,52 @@ export function InboxPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-slate-500 shrink-0">
-            <span>Filter:</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-full h-8 px-3 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
-                {assigneeLabel}
-                <ChevronDown className="h-3.5 w-3.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => setAssigneeFilter(null)}>
-                  All Assignees
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setAssigneeFilter("unassigned")}>
-                  Unassigned
-                </DropdownMenuItem>
-                {MOCK_USERS.map((u) => (
-                  <DropdownMenuItem key={u.id} onClick={() => setAssigneeFilter(u.id)}>
-                    {u.name}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Filter dropdown — always visible */}
+            <div className="flex items-center gap-2 text-sm text-slate-500">
+              <span>Filter:</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-full h-8 px-3 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+                  {assigneeLabel}
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => setAssigneeFilter(null)}>
+                    All Assignees
                   </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem onClick={() => setAssigneeFilter("unassigned")}>
+                    Unassigned
+                  </DropdownMenuItem>
+                  {MOCK_USERS.map((u) => (
+                    <DropdownMenuItem key={u.id} onClick={() => setAssigneeFilter(u.id)}>
+                      {u.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Bulk action — only when rows are selected */}
+            {selectedCount > 0 && (
+              <button
+                onClick={handleBulkAssign}
+                className="inline-flex items-center gap-2 rounded-full h-9 px-4 text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+              >
+                <User className="h-4 w-4" />
+                Assign to me ({selectedCount})
+              </button>
+            )}
           </div>
         </div>
 
         {/* Document table */}
         <DocumentTable
           documents={visibleDocs}
-          onDocumentsChange={setDocuments}
+          onDocumentsChange={handleDocumentsChange}
           globalFilter={search}
           statusFilter={activeTab}
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
         />
       </div>
     </div>

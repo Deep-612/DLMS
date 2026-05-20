@@ -14,7 +14,7 @@ import {
   type ExpandedState,
   type RowSelectionState,
 } from "@tanstack/react-table"
-import { ArrowDownUp, ChevronDown, ChevronRight, FileText } from "lucide-react"
+import { ArrowDownUp, ChevronDown, ChevronRight, FileText, Minus } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import {
@@ -42,6 +42,8 @@ type Props = {
   onDocumentsChange: (docs: Document[]) => void
   globalFilter: string
   statusFilter: string
+  rowSelection: RowSelectionState
+  onRowSelectionChange: (state: RowSelectionState) => void
 }
 
 export function DocumentTable({
@@ -49,11 +51,12 @@ export function DocumentTable({
   onDocumentsChange,
   globalFilter,
   statusFilter,
+  rowSelection,
+  onRowSelectionChange,
 }: Props) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [expanded, setExpanded] = useState<ExpandedState>({})
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   function updateAssignee(docId: string, user: User | null) {
     onDocumentsChange(
@@ -64,13 +67,30 @@ export function DocumentTable({
   const columns = [
     columnHelper.display({
       id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
-          aria-label="Select all"
-        />
-      ),
+      header: ({ table }) => {
+        const isAll = table.getIsAllPageRowsSelected()
+        const isSome = table.getIsSomePageRowsSelected()
+        return (
+          <div
+            role="checkbox"
+            aria-checked={isAll ? true : isSome ? "mixed" : false}
+            aria-label="Select all"
+            tabIndex={0}
+            onClick={() => table.toggleAllPageRowsSelected(!isAll)}
+            onKeyDown={(e) => e.key === " " && table.toggleAllPageRowsSelected(!isAll)}
+            className={`relative flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-[4px] border border-input transition-colors ${isAll || isSome ? "border-primary bg-primary text-primary-foreground" : ""}`}
+          >
+            {isAll && <ChevronDown className="hidden" />}
+            {isSome && !isAll ? (
+              <Minus className="h-3 w-3" />
+            ) : isAll ? (
+              <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : null}
+          </div>
+        )
+      },
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
@@ -179,11 +199,12 @@ export function DocumentTable({
   const table = useReactTable({
     data: documents,
     columns,
+    getRowId: (row) => row.id,
     state: { sorting, columnFilters, expanded, rowSelection, globalFilter },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onExpandedChange: setExpanded,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: onRowSelectionChange,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -236,7 +257,7 @@ export function DocumentTable({
             table.getRowModel().rows.map((row) => (
               <React.Fragment key={row.id}>
                 <TableRow
-                  className="hover:bg-slate-50/50 border-slate-100"
+                  className={`border-slate-100 transition-colors ${row.getIsSelected() ? "bg-slate-50" : "hover:bg-slate-50/50"}`}
                   data-state={row.getIsSelected() ? "selected" : undefined}
                 >
                   {row.getVisibleCells().map((cell) => (
